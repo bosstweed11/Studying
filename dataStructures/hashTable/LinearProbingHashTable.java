@@ -72,11 +72,42 @@ public class LinearProbingHashTable<Key, Value> implements STInterface<Key, Valu
 	}
 	
 	public Value get(Key key){
+		
+		for(int i = hash(key); this.keys[i] != null; i = (i + 1) % this.capacity){
+			this.probes++;
+			if (this.keys[i].equals(key)){
+				return values[i];
+			}
+		}
+		this.probes++;
 		return null;
 	}
 	
 	public void delete(Key key){
+		if (contains(key)){
+			int i = hash(key);
+			while (!key.equals(keys[i])){
+				i = (i + 1) % this.capacity;
+			}
+			
+			this.keys[i] = null;
+			this.values[i] = null;
+			
+			i = (i + 1) % this.capacity;
+			while (keys[i] != null){
+				Key keyToRehash = keys[i];
+				Value valueToRehash = values[i];
+				keys[i] = null;
+				values[i] = null;
+				this.size--;
+				this.put(keyToRehash, valueToRehash);
+				i = (i + 1) % this.capacity;
+			}
+			this.size--;
+		}
 		
+		if (this.size > 0 && this.size <= this.capacity / 8)
+			this.resize(this.capacity / 2);
 	}
 	
 	public Iterable<Key> keys(){
