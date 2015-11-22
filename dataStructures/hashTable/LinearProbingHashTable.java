@@ -1,5 +1,8 @@
 package dataStructures.hashTable;
 
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 
 public class LinearProbingHashTable<Key, Value> implements STInterface<Key, Value> {
 	
@@ -16,6 +19,7 @@ public class LinearProbingHashTable<Key, Value> implements STInterface<Key, Valu
 	}
 	
 	public LinearProbingHashTable(int capacity, boolean resizing){
+		
 		this.capacity = capacity;
 		this.resizing = resizing;
 		this.keys = (Key[]) new Object[capacity];
@@ -38,8 +42,10 @@ public class LinearProbingHashTable<Key, Value> implements STInterface<Key, Valu
 		if (value == null)
 			this.delete(key);
 		
-		if (this.size >= this.capacity / 2)
+		if (this.size >= this.capacity / 2){
+			System.out.println("resizng with: " + 2 * this.capacity);
 			this.resize(2 * this.capacity);
+		}
 		
 		int i;
 		for (i = hash(key); this.keys[i] != null; i = (i + 1) % this.capacity){
@@ -55,7 +61,7 @@ public class LinearProbingHashTable<Key, Value> implements STInterface<Key, Valu
 	
 	private void resize(int capacity){
 		if (this.resizing){
-			LinearProbingHashTable<Key, Value> temp = new LinearProbingHashTable<Key, Value>(this.capacity, true);
+			LinearProbingHashTable<Key, Value> temp = new LinearProbingHashTable<Key, Value>(capacity, true);
 			for (int i = 0; i < this.capacity; i++){
 				if (keys[i] != null){
 					temp.put(this.keys[i], this.values[i]);
@@ -111,10 +117,18 @@ public class LinearProbingHashTable<Key, Value> implements STInterface<Key, Valu
 	}
 	
 	public Iterable<Key> keys(){
-		return null;
+		Queue<Key> queue = new PriorityQueue<Key>();
+		for(int i = 0; i < this.capacity; i++){
+			if (keys[i] != null){
+				queue.add(keys[i]);
+			}
+		}
+		return queue;
 	}
 	
 	public int getProbes(){
-		return probes;
+		int temp = this.probes;
+		this.probes = 0;
+		return temp;
 	}
 }
